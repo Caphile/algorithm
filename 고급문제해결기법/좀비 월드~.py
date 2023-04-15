@@ -1,129 +1,70 @@
 # coding = cp949
-'''
-# 소수인 loc이 발생해 폐기
+
+def findEvent(bef, now):
+    if not bef or bef > now:
+        return now
+    return bef
+
 n, l, k = map(int, input().split())
 L, R = -1, 1
-left, right = [], []
-for _ in range(n):
+zombies = []    # 아이디, 현재위치, 진행방향
+for i in range(n):
     loc, iden = map(int, input().split())
-    if iden > 0:    # 우측
-        right.append([loc, iden])
-    else:           # 좌측
-        left.append([loc, iden])
+    zombies.append([iden, loc, int(iden / abs(iden))])
 
-outList = []    # 밖으로 떨어진 좀비
-while len(outList) < k:  
-    road = [None for _ in range(l + 1)]     # 아이디, 위치, 방향
-    check = [None for _ in range(l + 1)]
+zombies = sorted(zombies, key = lambda x : x[1])    # 각 좀비를 위치를 기준으로 정렬, O(nlogn)
 
-    for idx in range(len(right)):
-        zombie = right[idx]
-        road[zombie[0]] = [zombie[1], zombie[0], R]
-    for idx in range(len(left)):
-        zombie = left[idx]
-        road[zombie[0]] = [zombie[1], zombie[0], L]
-
-    before = None
-    coliLoc = None
-    triggerTime = 100000    # 현재 이후 최초 이벤트 발생까지 남은 시간
-    zombies = []
-    for loc in range(len(road)):
-        now = road[loc]
-        if now:
-            zombies.append(now)
-            if not before and now[2] == L:          # 추락
-                triggerTime = min(triggerTime, now[1])
-            elif now[2] == L and before[2] == R:    # 충돌
-                triggerTime = min(triggerTime, (now[1] - before[1]) / 2)
-                if triggerTime == (now[1] - before[1]) / 2:
-                    coliLoc = now[1] + now[2] * triggerTime
-            before = now
-            
-    if before[2] == R:
-        triggerTime = min(triggerTime, l - before[1])
-
-    left, right = [], []
-    thisOut = []
-    for z in zombies:
-        newLoc = z[1] + z[2] * triggerTime
-
-        if newLoc == 0 or newLoc == l:  # 추락
-            thisOut.append(z[0])
-        elif coliLoc and coliLoc == newLoc:
-            if z[2] == R:
-                left.append([newLoc, z[0]])
-            else:
-                right.append([newLoc, z[0]])
-        elif z[2] == R:
-            right.append([newLoc, z[0]])
-        else:
-            left.append([newLoc, z[0]])
-
-    for i in sorted(thisOut):
-        outList.append(i)
-
-print(outList)
-'''
-
-'''
-# 소수인 newLoc이 발생해 폐기
-n, l, k = map(int, input().split())
-L, R = -1, 1
-left, right = [None for _ in range(l + 1)], [None for _ in range(l + 1)]
-for _ in range(n):
-    loc, iden = map(int, input().split())
-    if iden > 0:   # 우측
-        right[loc] = iden
-    else:           # 좌측
-        left[loc] = iden
-
-outList = []    # 밖으로 떨어진 좀비
+outList = []
 while len(outList) < k:
-    road = []   # 아이디, 위치, 방향
-    check = []
-    for loc in range(l + 1):
-        if left[loc]:
-            road.append([left[loc], loc, L])
-            left[loc] = None
-        if right[loc]:
-            road.append([right[loc], loc, R])
-            right[loc] = None
-        check.append(False)
+    time = None
+    newN = len(zombies)
+    for i in range(newN - 1):
+        nowZ = zombies[i]
+        nextZ = zombies[i + 1]
 
-    triggerTime = 100000    # 현재 이후 최초 이벤트 발생까지 남은 시간
-    for idx in range(len(road)):
-        if road[idx][2] == R:
-            if idx == len(road) - 1:
-                triggerTime = min(triggerTime, l - road[idx][1])
-            elif road[idx + 1][2] == L:
-                triggerTime = min(triggerTime, (road[idx + 1][1] - road[idx][1]) / 2)
-
-        if road[idx][2] == L and idx == 0:
-            triggerTime = min(triggerTime, road[idx][1])
-
-    thisOut = []
-    for idx in range(len(road)):
-        newLoc = road[idx][1] + road[idx][2] * triggerTime
-        if not check[newLoc]:
-            if newLoc == 0 or newLoc == l:
-                thisOut.append(road[idx][0])
-            elif road[idx][2] == R:
-                right[newLoc] = road[idx][0]
+        if not i and nowZ[2] == L:              # 추락(왼쪽)
+            time = findEvent(time, nowZ[1])
+        elif nowZ[2] == R and nextZ[2] == L:    # 충돌
+            if nextZ[1] != nowZ[1]:
+                time = findEvent(time, (nextZ[1] - nowZ[1]) / 2)
             else:
-                left[newLoc] = road[idx][0]
-            check[newLoc] = True
-        else:
-            if road[idx][2] == R:
-                temp = left[newLoc]
-                left[newLoc] = road[idx][0]
-                right[newLoc] = temp
-            else:
-                temp = right[newLoc]
-                right[newLoc] = road[idx][0]
-                left[newLoc] = temp
+                zombies[i][2] *= -1
+                zombies[i + 1][2] *= -1
 
-    for i in sorted(thisOut):
+    nowZ = zombies[newN - 1]
+    if nowZ[2] == R:                            # 추락(오른쪽)
+        time = findEvent(time, l - nowZ[1])
+
+    subOut = []
+    newZombies = []
+    befZ = None
+    for i in range(newN):
+        nowZ = zombies[i]
+        newLoc = nowZ[1] + time * nowZ[2]
+        nowZombie = [nowZ[0], newLoc, nowZ[2]]
+
+        if newLoc == 0 or newLoc == l:
+            subOut.append(nowZ[0])
+            continue
+        
+        newZombies.append(nowZombie)
+
+        if i != newN - 1:
+            if befZ and newLoc == befNewLoc:
+                newZombies[i][2] *= -1
+                newZombies[i - 1][2] *= -1
+
+            befZ = nowZ
+            befNewLoc = newLoc
+
+    for i in sorted(subOut):
         outList.append(i)
+    zombies = newZombies
 
 print(outList[k - 1])
-'''
+
+# 충돌 또는 추락을 하나의 이벤트로 보고
+# 가장 빠르게 발생할 이벤트 시간을 기준으로 시뮬레이션을 돌림
+# 좀비를 위치 기준으로 정렬하는데 O(nlogn)
+# while을 돌면서 최악의 경우 O(n^2)
+# 시간복잡도는 O(n^2)
