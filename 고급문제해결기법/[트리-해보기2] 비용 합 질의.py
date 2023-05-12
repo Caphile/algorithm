@@ -62,3 +62,11 @@ for _ in range(q):
         value = int(order[2])
         nodes[nd].value = value
         update(nodes[nd].idx, nodes[nd].value)
+
+# 각 노드의 정보를 class로 nodes 리스트에 저장
+# preorder로 탐색했을때 방문하는 노드번호를 저장하는 pre 리스트를 구함
+# preorder로 탐색함과 동시에 부트리의 노드 개수를 구함
+# cost값이 업데이트 될 수 있으므로 cost를 BIT 자료구조로 저장함 O(nlogn)
+# 업데이트 쿼리에 O(logn) 시간 소요되고
+# cost의 prefixSum을 구하는데 O(logn)시간 걸리므로
+# 시간복잡도는 O(nlogn)

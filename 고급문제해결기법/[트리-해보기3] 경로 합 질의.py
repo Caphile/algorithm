@@ -69,3 +69,12 @@ for _ in range(q):
         value = int(order[2])
         update(nodes[nd].idx, value)
         update(nodes[nd].idx + nodes[nd].subs, -value)
+
+# 각 노드의 정보를 class로 nodes 리스트에 저장 
+# preorder로 탐색했을때 방문하는 노드번호를 저장하는 pre 리스트를 구함
+# preorder로 탐색함과 동시에 부트리의 노드 개수와 pathSum을 구함
+# pre순서대로 나열된 node들간의 차를 각 node의 diff에 저장한 뒤,
+# diff값이 업데이트 될 수 있으므로 diff를 BIT 자료구조로 저장함 O(nlogn)
+# 한 질의당 두번의 업데이트 쿼리에 O(logn) 시간 소요되고
+# diff의 prefixSum을 구하는데 O(logn)시간 걸리므로
+# 시간복잡도는 O(nlogn)

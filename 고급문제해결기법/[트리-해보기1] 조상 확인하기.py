@@ -1,3 +1,6 @@
+import sys
+sys.setrecursionlimit(10000)
+
 class node:
     def __init__(self, now):
         self.n = now
@@ -45,3 +48,9 @@ for _ in range(q):
         count += 1
 
 print(count)
+
+# 각 노드의 정보를 class로 nodes 리스트에 저장
+# 노드 번호 순서대로 preorder와 postorder를 구한 뒤
+# pre[u] < pre[v] and post[u] > post[v]이거나 u == v인 질의에 대해 True 카운트를 더함
+# preorder, postorder 탐색과 각 노드의 저장, 질의에 대한 답이 모두 O(n)이므로
+# 시간복잡도는 O(n)
