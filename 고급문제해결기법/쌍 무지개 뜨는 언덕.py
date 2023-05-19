@@ -35,43 +35,35 @@ for i in range(n):
 
 s, e = 0, -1
 move('e')
-target = line[0]
 seq = False
 rainbows = []
 while s < n:  # 한 바퀴를 다 돌때까지
-    if not nows[target]:
+    if nowCount == k:       # 무지개   
+        if numCount == k:   # 쌍무지개
+            if seq:
+                rainbows.pop()
+            rainbows.append(e - s + 1)
+            seq = True
+        move('s')
+    else:
         if e + 1 == n:
             break
         seq = False
         move('e')
-    else:
-        if nowCount == k:       # 무지개   
-            if numCount == k:   # 쌍무지개
-                if seq:
-                    rainbows.pop()
-                rainbows.append(e - s + 1)
-                seq = True
-            move('s')
-        else:
-            if e + 1 == n:
-                break
-            seq = False
-            move('e')
 
 if not len(rainbows):
     print(0)
 else:
     print(min(rainbows))
 
-# 모든 무지개는 결국 모든 색을 가지고 있어야 하므로
-# 무지개는 최대 특정 색이 등장한 만큼까지만 만들기 가능 (코드에선 line[0]으로 지정)
-# 따라서 해당 색을 1개 이상 보유한 채로 무지개를 만들 수 있는 구간을 찾음
-# 1. 색이 없다면 e + 1
-# 2. 색이 있고 무지개가 만들어진다면
-# 2-1. 쌍무지개가 만들어진다면 무지개 길이 저장 후 s + 1
+# 구간을 s부터 e까지라고 했을때 이 구간이 무지개가 만들어지는지 확인
+# 무지개가 만들어지는 경우는 nowCount가 k값과 같을때,
+# 쌍무지개가 만들어지는 경우는 무지개가 만들어지는 상태에서 numCount가 k값과 같을때
+# 1. 무지개가 만들어진다면
+# 1-1. 쌍무지개가 만들어진다면 무지개 길이 저장 후 s + 1
 # 이때 s + 1를 해서 똑같이 쌍무지개가 생길 수 있으므로 seq 상태 가져감
-# 2-2. 쌍무지개를 만들지 못한다면 e + 1
-# 3. 색이 있고 무지개가 만들어지지 않는다면 e + 1
+# 1-2. 쌍무지개를 만들지 못한다면 s + 1
+# 2. 무지개가 만들어지지 않는다면 e + 1
 # 저장된 쌍무지개가 있다면 그 중 최소값, 없다면 0을 출력
 # s와 e가 최대 n번까지만 탐색하므로 (move함수도 O(1))
 # O(n) 시간복잡도를 가짐
