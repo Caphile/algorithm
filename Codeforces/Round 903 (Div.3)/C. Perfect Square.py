@@ -1,8 +1,5 @@
 t = int(input())
 
-def conv(ori, trg):
-    return abs(ord(ori) - ord(trg))
-
 for _ in range(t):
     n = int(input())
 
@@ -10,18 +7,13 @@ for _ in range(t):
     for _ in range(n):
         sqr.append(list(input()))
 
-    new_sqr = []
-    for x in range(n - 1, -1, -1):
-        line = ""
-        for y in range(n - 1, -1, -1):
-            line = sqr[y][x] + line
-        new_sqr.append(line)
+    ans = 0
+    for i in range(n // 2):
+        for j in range(n // 2):
+            now = [sqr[j][i], sqr[i][n - 1 - j], sqr[n - 1 - i][j], sqr[n - 1 - j][n - 1 - i]]
+            now = [ord(x) for x in now]
 
-    sum = 0
-    for y in range(n):
-        for x in range(n):
-            a, b = sqr[y][x], new_sqr[y][x]
-            if a != b:
-                sum += conv(a, b)
+            now_max= max(now)
+            ans += now_max * 4 - sum(now)
     
-    print(sum / 2)
+    print(ans)
